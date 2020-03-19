@@ -1,0 +1,93 @@
+from time import sleep
+
+# Getting inputs
+
+fog_node_count = int(input("Please enter the number of fog nodes: "))
+end_node_count = int(input("Please enter the number of end-nodes authenticated with each fog node: "))
+
+latency_small = float(input("Please enter smallest latency: "))
+latency_high = float(input("Please enter the highest latency: "))
+
+
+# Modelling the system
+
+class Message:
+
+    def __init__(self, tx, id, cluster):
+        self.tx = tx
+        self.id = id  # node id
+        self.cluster = cluster  # fog id
+
+
+class Node:
+
+    def __init__(self, id):
+        self.id = id
+        self.fog_node = None
+        self.buffer = list()
+        self.connected_nodes = list()
+        self.transactions = list()
+
+    def connect(self, node):
+        if isinstance(node, FogNode):
+            self.fog_node = node
+
+            self.connected_nodes.append(node)
+            node.connected_nodes.append(self)
+
+    def receive_message(self, message):
+        self.buffer.append(message)
+
+    def send_message(self):
+        sleep(latency_small)
+        self.fog_node.receive_message(Message(tx="random", id=self.id, cluster=self.fog_node.id))
+
+    def __str__(self):
+        if self.fog_node is not None:
+            return str(self.fog_node) + "." + str(self.id)
+        else:
+            return str(self.id)
+
+
+class FogNode(Node):
+
+    def receive_message(self, message):
+        message.id = None  # for privacy
+        self.buffer.append(message)
+        self.send_message(message)
+
+    def connect(self, node):
+        if not isinstance(node, FogNode):
+            node.fog_node = self
+
+        self.connected_nodes.append(node)
+        node.connected_nodes.append(self)
+
+    def send_message(self, message):
+        for node in self.connected_nodes:
+            if message.id is None:  # sent from a fog node
+                if isinstance(node, Node):
+                    sleep(latency_high)
+                    node.receive_message(message)
+            elif node.id != message.id or node.fog_node is None:
+                # a node that doesnt have fog node means that it is a fog node
+                sleep(latency_small)
+                node.receive_message(message)
+
+
+# Building the network
+
+network = {
+    "fog_nodes": set(),
+    "nodes": set()
+}
+
+for generated_main_id in range(fog_node_count):
+    fog_node = FogNode(generated_main_id + 1)
+    for network_node in network['fog_nodes']:
+        network_node.connect(fog_node)
+    network['fog_nodes'].add(fog_node)
+    for generated_sub_id in range(end_node_count):
+        node = Node(generated_sub_id + 1)
+        Node.connect(fog_node)
+        network['nodes'].add(Node)
