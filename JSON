@@ -1,0 +1,7 @@
+{
+  "fog_node_count": 5,
+  "end_node_count": 5,
+  "latency_small": 1,
+  "latency_high": 2,
+  "number_of_miners": 5
+}
