@@ -1,1 +1,89 @@
+import random
+import numpy
+from numpy import *
+
+Num_Ants= int(input('enter ants number: '))
+Num_Iterations= int(input('enter iterations number: '))
+Num_VMs = int(input('enter VMs number: '))
+Num_Task = int(input('enter number of Tasks: '))
+Evaporation = int(input('enter value of evaporation: '))
+Best_Usage = int(input('enter the value of Best Usage: '))
+Tasks = []
+VMs = []
+Utilization_Matrix = [len(Tasks), len(VMs)]
+Pheromon_Matrix = [len(Tasks), len(VMs)]
+Best_schedule = [len(Tasks), len(VMs)]
+
+# Function to get max element
+def maxelement(arr):
+    # get number of rows and columns
+    no_of_rows = len(arr)
+    no_of_column = len(arr[0])
+
+    for i in range(no_of_rows):
+
+        # Initialize max1 to 0 at beginning
+        # of finding max element of each row
+        max1 = 0
+        for j in range(no_of_column):
+            if arr[i][j] > max1:
+                max1 = arr[i][j]
+
+                # print maximum element of each row
+        return (max1)
+
+for l in range (Num_Task):
+    # generate random wight for tasks
+    Tasks.append(random.random())
+    print(Tasks[l])
+    print ("\n")
+print (Tasks)
+for i in range (Num_VMs):
+    VMs[i] = VMs.append(random.randint(0, 1000))
+    print(VMs[i])
+    print("\n")
+
+# fill the utilization matrix based on the tasks and virtual machines
+for ut in range (Num_Task):
+    for ut2 in range (Num_VMs):
+        x=Tasks[ut]/VMs[ut2]
+        print (x)
+        Utilization_Matrix[ut][ut2].append(x)
+        print(Utilization_Matrix)
+
+for k in range (Num_Ants):
+    print("the schedules by ant number ", k, "\n")
+    Local = [Num_Task][Num_VMs]
+    for it in range (Num_Iterations):
+        #fill Local with Zeros and Ones, such that, there is only one '1' in each row
+        for t in range (Num_Task):
+            for p in range (Num_VMs):
+                if (Local[t, p] == 1):
+                    Prob = (Pheromon_Matrix[t, p] / sum(phermon_matr[t, ])) # update phermon based on the probability that the ant will choose this pair(higher probability higher phermon)
+                    Pheromon_Matrix[t, p] = Pheromon_Matrix[t, p] + Prob
+    #WISLY multiply Utilization_Matrix with Local matrix (using '*')
+    #do the following to the resultant matrix (R):
+    #find the SUM of all the elements of the (R) matrix,
+    #find the MAX value of all elements of the (R) matrix,
+    #define the USAGE of the Local matrix which equals: USAGE= SUM + MAX
+    # evaporation of the phermon
+    Pheromon_Matrix = phermon_matr * Evaporation
+
+# update phermon matrix by the quality of feasible schedules
+
+    for t in range (Num_Task):
+        for p in range (Num_VMs):
+            # check the options for the ant
+            if Local[t, p] != 0:
+                Pheromon_Matrix[t, p] = Pheromon_Matrix[t, p]+ (1 / Num_Ants)
+    # choose the best schedule based on the quality of the schedule
+    if usage < Best_Usage:
+        Best_schedule = Pheromon_Matrix
+        Best_Usage = usage
+        print(best_sch_matr)
+        print(usage)
+
+print (maxelement (Best_schedule))
+print(usage)
+
 
