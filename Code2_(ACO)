@@ -12,10 +12,18 @@ with open("input.json") as json_file:
     Best_Usage = data["Best_Usage"]
     One_min_Cost_of_VM = data["One_min_Cost_of_VM"]
     Best_Cost = data["Best_Cost"]
-    Num_Iterations = data["Num_Iterations"]
-
+variable = 1000
 Tasks = []
 VMs = []
+best_Ant_assignment = np.ones((Num_Task, Num_VMs))
+for i in range(len(Tasks)):
+    for j in range(len(VMs)):
+       best_Ant_assignment[i,j] = variable
+result = Num_Task/ Num_VMs
+usage = 0
+Cost = 0
+Best_Ant = 0
+Pheromon_Matrix = np.ones((Num_Task, Num_VMs))
 
 def find_assignment(arr):
     row_count = len(arr[:])
@@ -28,124 +36,99 @@ def find_assignment(arr):
     return result
 
 def sumRow(m, row):
-    total = 0
-    list = []
+    sum = 0
     for i in range(len(VMs)):
-        list.append(m[row-1][i])
-    print(list)
-    total = sum(list)
-    print(total)
-    return total
+        sum = sum + m[row-1][i]
+    return sum
 
 def sumColumn(m, Column):
-    total = 0
-    list = []
+    sum = 0
     for i in range(len(Tasks)):
-        list.append(m[i][Column-1])
-    print(list)
-    total = sum(list)
-    print(total)
-    return total
+        sum = sum + m[i][Column-1]
+    return sum
+
+def changePheromoneMatrixToLocal(v):
+    max_row = 0
+    max_index = 0
+    v_modified = np.zeros((Num_Task, Num_VMs))
+    for i in range(len(Tasks)):
+        max_value = 0
+        for j in range(len(VMs)):
+            if v[i-1][j-1] > max_value:
+                max_value = v[i-1][j-1]
+                max_row = i-1
+                max_index = j-1
+        v_modified[max_row][max_index] = 1
+    print("The localized Pheromon Matrix is :")
+    print(v_modified)
+    return v_modified
 
 for l in range(Num_Task):
     # generate random wight for tasks
     Tasks.append(random.randint(100000000, 1000000000))
     print(str(l+1) + ". " + str(Tasks[l]))
 print(str(Num_Task) + " tasks had been assigned random power consumption values.")
+
 for i in range(Num_VMs):
     VMs.append((random.randint(1000000, 12000000)))
 print("The processor's computational power of the available VMs: ", VMs)
 Utilization_Matrix = np.zeros([len(Tasks), len(VMs)])
 Best_schedule = np.zeros([len(Tasks), len(VMs)])
 
-# fill the utilization matrix based on the tasks and virtual machines
 for ut in range(Num_Task):
     for ut2 in range(Num_VMs):
         Utilization_Matrix[ut][ut2] = Tasks[ut]/int(VMs[ut2])
-usage = 0
-Cost = 0
-Pheromon_Matrix = np.ones([len(Tasks), len(VMs)])
 print("the utilization matrix is: ")
 print(Utilization_Matrix)
+
 for k in range(Num_Ants):
     print("\n\n*******\nAnt number " + str(k + 1) + " started\n*******\nthe local matrix is:")
     Local = np.zeros([len(Tasks), len(VMs)])
-    while np.sum(Local) < (len(Tasks)): #fill Local with Zeros and Ones, such that, there is only one "1" in each row
-        for i in range (Num_VMs):
-            index = random.randint(0, len(Tasks))
-            if sumRow(Local, index) == 0: #and sumColumn(Local, i) < Num_Task/Num_VMs:
-                Local[index-1][i] = 1
-            else:
-                pass
-            print(Local)
-    for it in range(Num_Iterations):
+    while np.sum(Local) < Num_Task:
+        index = random.randint(0, Num_VMs)
+        rownum = random.randint(0, Num_Task)
+        while sumColumn(Local, index) >= result or sumRow(Local, rownum) >= 1:
+            index = random.randint(0, Num_VMs)
+            rownum = random.randint(0, Num_Task)
+        Local[rownum-1][index-1] = 1
+    print(Local)
+    for it in range(Num_VMs-1):
         Local_usage=np.max(np.sum(Utilization_Matrix * Local, axis=0))
         Local_iteration_matrix = Local
         for t in range(Num_Task):
-            for p in range(Num_VMs):
-                if Local_iteration_matrix[t, p] == 1:
-                    if p != 0:
-                        Local_iteration_matrix[t,p-1] = 1
-                        Local_iteration_matrix[t,p] = 0
-                        if np.max(np.sum((Local_iteration_matrix * Utilization_Matrix), axis=0)) < Local_usage:
-                            print("A new Local Matrix had been built:")
-                            print(Local_iteration_matrix)
-                            print("Old best usage = " + str(np.max(np.sum(Utilization_Matrix * Local, axis=0))))
-                            print("The new best usage = " + str(np.max(np.sum(Utilization_Matrix * Local_iteration_matrix, axis=0))))
-                            Local = Local_iteration_matrix
-                            Local_usage=np.max(np.sum(Utilization_Matrix * Local, axis=0))
-                        else:
-                            print("A new Local Matrix had not been built. (Trial Number: " + str(t*p+1) + ")")
-                    else:
-                        Local_iteration_matrix[t, - 1] = 1
-                        Local_iteration_matrix[t, 0] = 0
-                        if np.max(np.sum((Local_iteration_matrix * Utilization_Matrix), axis=0)) < Local_usage:
-                            print("A new Local Matrix had been built:")
-                            print(Local_iteration_matrix)
-                            print("Old best usage = " + str(np.max(np.sum(Utilization_Matrix * Local, axis=0))))
-                            print("The new best usage = " + str(np.max(np.sum(Utilization_Matrix * Local_iteration_matrix, axis=0))))
-                            Local = Local_iteration_matrix
-                            Local_usage = np.max(np.sum(Utilization_Matrix * Local, axis=0))
-
-                        else:
-                            print("A new Local Matrix had not been built. (Trial Number: " + str(t*p+1) + ")")
-        for t in range(Num_Task):
-            for p in range(Num_VMs):
-                if Local[t, p] != 0:
-                    Prob = (Pheromon_Matrix[t, p] / sum(Pheromon_Matrix[t, ]))
-                    Pheromon_Matrix[t, p] = Pheromon_Matrix[t, p] + (1 / Num_Ants) * Prob
-                    if Pheromon_Matrix[t, p] < 0:
-                        Pheromon_Matrix[t, p] = 0
+                if Local_iteration_matrix[t, it] == 1:
+                    Local_iteration_matrix[t,it-1] = 1
+                    Local_iteration_matrix[t,it] = 0
+                    if np.max(np.sum((Local_iteration_matrix * Utilization_Matrix), axis=0)) < Local_usage:
+                        print("A new Local Matrix had been built:")
+                        print(Local_iteration_matrix)
+                        Local = Local_iteration_matrix
+                        Local_usage = np.max(np.sum(Utilization_Matrix * Local, axis=0))
+                    if ((np.max(np.sum((Local_iteration_matrix * Utilization_Matrix), axis=0))) < (np.max(np.sum((changePheromoneMatrixToLocal(best_Ant_assignment) * Utilization_Matrix), axis=0)))):
+                        best_Ant_assignment = Local_iteration_matrix
+                        Best_Ant = k
+    for t in range(len(Tasks)):
+        for p in range(len(VMs)):
+            if Local[t, p] != 0:
+                mod = sumRow(Pheromon_Matrix, t)
+                if mod == 0:
+                    mod = Num_VMs
+                Prob = Pheromon_Matrix[t][p] / mod
+                Pheromon_Matrix[t][p] = Pheromon_Matrix[t][p] + (1 / Num_Ants) + Prob
     print("The pheromon matrix has been updated as follows: ")
-    print(Pheromon_Matrix)
-    #compare the pheromon best usage to the local best usage here, and choose the best.
-
-
-    R = Utilization_Matrix * Local
-    print("the proposed matrix by this ant is:")
-    print(R)
-    Time_consumption = np.max(np.sum(R, axis=0))
-    print("Time consumption of the above schedule is " + str (Time_consumption))
-    cost = Time_consumption * One_min_Cost_of_VM * Num_VMs / 60
-    print("Cost of the above schedule is " + str(cost))
-    if Time_consumption < Best_Usage or cost < Best_Cost:
-        print("\n************************************************************\nNew optimal solution has been found!\n************************************************************")
-        Best_schedule = R
-        Best_Usage = Time_consumption
-        Best_Cost = cost
-        Best_Ant= k
-    else:
-        print("This ant did not provide a better solution!")
+    Pheromon_Matrix = (1-Evaporation) * Pheromon_Matrix
+    print(Pheromon_Matrix.reshape(Num_Task,Num_VMs))
     print(" Ant Number: " + str(k + 1) + " finished its iterations.")
-    print("The best time consumption proposed so far equals: " + str(Best_Usage) + ".")
-    Pheromon_Matrix = Pheromon_Matrix * Evaporation
-    print("the Pheromon_Matrix matrix after evaporation is:")
-    print(Pheromon_Matrix)
-
-print("\nThe best assignment for the tasks to the Virtual Machines was provided by Ant Number: " + str(Best_Ant))
+Time_consumption = np.max(np.sum(Utilization_Matrix * changePheromoneMatrixToLocal(Pheromon_Matrix), axis=0))
+Cost = Time_consumption * One_min_Cost_of_VM * Num_VMs / 60
+Best_Usage = Time_consumption
+Best_Cost = Cost
+Best_schedule = Utilization_Matrix * changePheromoneMatrixToLocal(Pheromon_Matrix)
+print("The suggested assignment by the majority of ants:")
 print(find_assignment(Best_schedule))
 print("\nThe time consumption of the virtual machines to perform the requested tasks equals: ")
 print(str(Best_Usage) + " seconds" + "\n         = " + str(Best_Usage/60) + " minutes \n         = " + str(Best_Usage/3600) + " hours.")
 print("Total estimate cost of VMs in the cloud = ")
 print(str(Best_Cost) + " $")
-
+print("The best individule assignment by ant number " + str(Best_Ant+1) + ", with Time consumption of: (" + str(np.max(np.sum(Utilization_Matrix * changePheromoneMatrixToLocal(best_Ant_assignment), axis=0))) + ") is:")
+print(find_assignment(changePheromoneMatrixToLocal(best_Ant_assignment)))
