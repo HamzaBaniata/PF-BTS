@@ -3,5 +3,13 @@
   "end_node_count": 5,
   "latency_small": 1,
   "latency_high": 2,
-  "number_of_miners": 5
+  "number_of_miners": 5,
+
+  "Num_Ants": 500,
+  "Num_VMs": 5,
+  "Num_Task": 5,
+  "Evaporation": 0.3,
+  "Best_Usage": 100000000,
+  "One_min_Cost_of_VM": 0.1,
+  "Best_Cost": 10000000
 }
