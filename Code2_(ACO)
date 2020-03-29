@@ -112,7 +112,7 @@ for k in range(Num_Ants):
             if Local[t, p] != 0:
                 mod = sumRow(Pheromon_Matrix, t)
                 if mod == 0:
-                    mod = Num_VMs
+                    mod = Num_VMs*Num_Task/1000
                 Prob = Pheromon_Matrix[t][p] / mod
                 Pheromon_Matrix[t][p] = Pheromon_Matrix[t][p] + (1 / Num_Ants) + Prob
     print("The pheromon matrix has been updated as follows: ")
