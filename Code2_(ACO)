@@ -2,6 +2,9 @@
 
 
 
+
+
+
 n =int(input("Enter number of Processes: \n"))
 bt = [] #Burst Time
 wt = [0,0,0,0,0,0,0,0,0,0,0] #waiting Time
@@ -9,6 +12,20 @@ tat = [0,0,0,0,0,0,0,0,0,0,0] #Turn around Time
 #Take input
 for i in range(n):
     bt.append(int(input(f"Enter Burst Time for process {i} -> ")))
+processes=[]
+for i in range(0,n):
+ processes.insert(i,i+1)
+for i in range(0,len(bt)-1):  #applying bubble sort to sort process according to their burst time
+    for j in range(0,len(bt)-i-1):
+        if(bt[j]>bt[j+1]):
+            temp=bt[j]
+            bt[j]=bt[j+1]
+            bt[j+1]=temp
+            temp=processes[j]
+            processes[j]=processes[j+1]
+            processes[j+1]=temp
+
+
 #waiting Time:
 for i in range(1,n):
     wt[i] = 0
@@ -20,4 +37,6 @@ for i in range (0,n):
 
 print("\n    Processes     Burst Time       waiting time        Turn around time")
 for i in range (n):
-    print(f"    p[{i+1}]                {bt[i]}                {wt[i]}                  {tat[i]}")
+    print(f"    \tp[{i+1}]                {bt[i]}                {wt[i]}                  {tat[i]}")
+
+
