@@ -1,0 +1,18 @@
+{
+  "TPC_Capacity": 20,
+  "Num_Ants": 2,
+  "Num_VMs": 2,
+  "Num_Task": 10,
+  "Evaporation": 0.3,
+  "Best_Usage": 1000000000000,
+  "One_min_Cost_of_VM": 0.1,
+  "Best_Cost": 100000000000,
+  "ant_alg_count": 5,
+  "first_come_first_count": 1,
+  "round_robin_count": 1,
+  "short_job_first_count": 1,
+  "minimum_length_of_task": 100,
+  "maximum_length_of_task": 1000,
+  "minimum_capacity_of_vm": 4,
+  "maximum_capacity_of_vm": 48
+}
