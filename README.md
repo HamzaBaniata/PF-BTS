@@ -4,5 +4,7 @@ This code is a part of a research paper that was submitted to Information Proces
 
 Link to the paper: https://www.researchgate.net/publication/344327541_PF-BTS_A_Privacy-aware_Fog-enhanced_Blockchain-assisted_Task_Scheduling
 
+DOI: 10.1016/j.ipm.2020.102393
+
 The default copyright laws apply, meaning that the creator of this open-source code (Hamza Baniata) retains all rights to the source code.
 Further, no one may reproduce, distribute, modify, or create derivative works from this work unless officially permitted by the creator of this repository. Not complying to the default copyrights may lead to risk of take-downs, shake-downs, or litigation.
